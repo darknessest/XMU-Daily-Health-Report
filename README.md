@@ -14,6 +14,8 @@ More information about ChromeDriver on [Selenium Wiki](https://github.com/Seleni
 You can download chromeDriver from [official website](https://sites.google.com/a/chromium.org/chromedriver/downloads)
 (要翻墙。不能翻墙的话，去百度一下，下载下载)
 
+Or use ones in this git. There were downloaded from the official website on 2020/03/28.
+
 To run:
 1) fill in login and password for logging in
 2) provide a path to your webdriver
