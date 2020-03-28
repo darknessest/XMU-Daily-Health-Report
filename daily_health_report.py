@@ -23,7 +23,7 @@ login = ''  # student number
 password = ''  # you should know it
 
 url = 'https://xmuxg.xmu.edu.cn/app/214'
-path_to_driver = os.path.join('chromedriver')
+path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
 
 driver = webdriver.Chrome(path_to_driver)
 driver.get(url)
@@ -64,7 +64,7 @@ curdate = datetime.today().strftime('%Y-%m-%d')
 if len(driver.find_elements_by_xpath("//span[text()[contains(.,'" + curdate + "')]]")) > 0:
     print("date is correct:", curdate)
 else:
-    print("there's something wrong with date, but we'll continue anyway")
+    print("there's something wrong with date " + curdate + ", but we'll continue anyway")
 
 '''
     CHECK TIME
@@ -100,18 +100,20 @@ not_used = waitForElement(driver, element_info="//span[text()[contains(.,'37.3')
 # hoping that the last element is the confirmation one
 confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'form-control dropdown-toggle')]")[-1]
 
-confirmation_field.click()
-print("2) chose confirmation field")
-
 '''
     CLICK YES
 '''
 if len(driver.find_elements_by_xpath("//span[text()[contains(.,'是 Yes')]]/ancestor::label[@class='btn-block']")) > 0:
     print("confirmation is already yes, consider checking website yourself")
     # clicking outside
-    driver.find_element_by_xpath("//body").click()
+    # driver.find_element_by_xpath("//body").click()
 else:
-    yes_button = driver.find_element_by_xpath("//span[text()[contains(.,'请选择')]]/ancestor::label[@class='btn-block']")
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+    # hoping that the last element is the confirmation one
+    confirmation_field.click()
+    print("2) chose confirmation field")
+    yes_button = driver.find_element_by_xpath("//span[text()[contains(.,'是 Yes')]]/ancestor::label[@class='btn-block']")
+
     yes_button.click()
 print("3) clicked yes-button")
 
