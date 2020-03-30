@@ -1,5 +1,5 @@
-import time
 import os
+import requests
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -8,7 +8,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-def waitForElement(driver, by_what=By.XPATH, element_info='', delay=5):
+def waitForElement(driver, by_what=By.XPATH, element_info='', delay=5, do_quit=True):
     try:
         elem = WebDriverWait(driver, delay).until(EC.presence_of_element_located((by_what, element_info)))
         print("Page is ready!")
@@ -16,12 +16,41 @@ def waitForElement(driver, by_what=By.XPATH, element_info='', delay=5):
     except TimeoutException:
         print("Loading took too much time!")
         print("quiting while waiting for element:", element_info)
-        driver.quit()
+        if do_quit:
+            driver.quit()
+        return None
+
+
+def sendNotification(app_name, message, additional_message='', event_name='log_from_app'):
+    my_key = ''
+    data = {
+        "value1": app_name,
+        "value2": message,
+        "value3": additional_message
+    }
+    url = "https://maker.ifttt.com/trigger/" + event_name + "/with/key/" + my_key
+
+    r = requests.post(url, data=data)
+
+    return r
+
+
+def send_report_and_close(report, driver):
+    for i in range(10):
+        r = sendNotification("Health report", report)
+        if r.status_code == 200:
+            break
+        else:
+            print("Hasn't sent retrying... " + str(i) + " of 10")
+
+    driver.close()
+    exit()
 
 
 login = ''  # student number
 password = ''  # you should know it
 
+report = ''
 url = 'https://xmuxg.xmu.edu.cn/app/214'
 path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
 
@@ -54,17 +83,28 @@ if 'login' in loaded_url:
     loging_button = driver.find_element_by_xpath("//button[contains(.,'登录/Login')]")
     loging_button.click()
 
-print('logged in')
+    if loaded_url != driver.current_url:
+        print("logged in successfully")
+        report += "Login OK."
+    else:
+        print("Hasn't logged in")
+        report = "Hasn't logged in. Check log:pass"
+        send_report_and_close(report, driver)
+
+print("logged in")
 
 '''
     CHECK DATE
 '''
+menu_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
 
 curdate = datetime.today().strftime('%Y-%m-%d')
 if len(driver.find_elements_by_xpath("//span[text()[contains(.,'" + curdate + "')]]")) > 0:
     print("date is correct:", curdate)
+    report += "Date OK."
 else:
     print("there's something wrong with date " + curdate + ", but we'll continue anyway")
+    report += "Date BAD."
 
 '''
     CHECK TIME
@@ -74,19 +114,18 @@ minutes = int(datetime.today().strftime('%M'))
 
 if hours >= 16 and minutes >= 30:
     print("too late for the daily health report")
-    driver.close()
-    print("exiting")
-    exit()
+    report += "Time BAD."
+    send_report_and_close(report, driver)
+    # TODO: send_report_and_close()
 else:
     print("time's alright:", hours, ':', minutes)
+    report += "Time OK."
 
 '''
     REPORTING PART
     MENU BUTTON
 '''
-menu_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
-# menu_button = driver.find_element_by_xpath("//div[contains(@class, 'tab')][2]")
-# menu_button = driver.find_element_by_xpath("//div[text()='我的菜单')]")
+
 menu_button.click()
 print("1) chose 我的菜单")
 
@@ -103,8 +142,9 @@ confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'form
 '''
     CLICK YES
 '''
-if len(driver.find_elements_by_xpath("//span[text()[contains(.,'是 Yes')]]/ancestor::label[@class='btn-block']")) > 0:
+if len(driver.find_elements_by_xpath("//span[text()[contains(.,'是 Yes')]]")) > 0:
     print("confirmation is already yes, consider checking website yourself")
+    report += 'Yes already.'
     # clicking outside
     # driver.find_element_by_xpath("//body").click()
 else:
@@ -120,22 +160,42 @@ print("3) clicked yes-button")
 '''
     SAVE BUTTON
 '''
-save_button = driver.find_elements_by_xpath("//span[text()[contains(.,'保存')]]")
 # May cause some problems if there will be something below the button
-save_button[-1].click()
-print("4) clicked save")
+save_button = driver.find_elements_by_xpath("//span[text()[contains(.,'保存')]]")[-1]
 
 '''
-    POPUP ALERT
+    保存成功
 '''
-driver.switch_to.alert.accept()
-print("5) clicked OK on an alert window")
+
+saved_suc = None
+retry = -1
+while saved_suc is None and retry < 10:
+    retry += 1
+    if retry > 0:
+        print("Hasn't saved retrying:", retry, "of 10")
+    save_button.click()
+    print("4) clicked save")
+
+    '''
+        POPUP ALERT
+    '''
+    driver.switch_to.alert.accept()
+    print("5) clicked OK on an alert window")
+
+    '''
+        保存成功
+    '''
+    saved_suc = waitForElement(driver, delay=7, element_info="//pre[contains(@class, 'message')]", do_quit=False)
+
+report += 'Saved OK.'
+if retry > 0:
+    report += str(retry) + ' retry'
+
+print("6) has been saved")
 
 '''
     DONE
 '''
-print('sleeping for 5 sec, so you can see the result')
-time.sleep(5)  # kinda waiting for a response
-
-driver.close()
 print("It should be done by now")
+send_report_and_close(report, driver)
+
