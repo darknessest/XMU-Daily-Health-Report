@@ -56,6 +56,16 @@ if 'login' in loaded_url:
 
 print('logged in')
 
+
+'''
+    SELECT PROPER SECTION
+'''
+print("selecting daily health section")
+dhr_section = waitForElement(driver, element_info="//div[@class='box_main box_flex']//div[1]//div[2]//div[2]")
+dhr_section.click()
+
+menu_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
+
 '''
     CHECK DATE
 '''
