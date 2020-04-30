@@ -2,13 +2,14 @@ import os
 import requests
 from datetime import datetime
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-def waitForElement(driver, by_what=By.XPATH, element_info='', delay=5, do_quit=True):
+def waitForElement(driver, by_what=By.XPATH, element_info='', delay=60, do_quit=True):
     try:
         elem = WebDriverWait(driver, delay).until(EC.presence_of_element_located((by_what, element_info)))
         print("Page is ready!")
@@ -17,12 +18,13 @@ def waitForElement(driver, by_what=By.XPATH, element_info='', delay=5, do_quit=T
         print("Loading took too much time!")
         print("quiting while waiting for element:", element_info)
         if do_quit:
-            driver.quit()
+            send_report_and_close("quiting while waiting for element: " + element_info, driver)
+            # driver.quit()
         return None
 
 
-def sendNotification(app_name, message, additional_message='', event_name='log_from_app'):
-    my_key = ''
+def sendNotification(app_name, message, additional_message='', event_name='program_log', special='FATAL'):
+    my_key = 'dtFZmutEg9ANUtSEpAU7Tu'
     data = {
         "value1": app_name,
         "value2": message,
@@ -35,15 +37,15 @@ def sendNotification(app_name, message, additional_message='', event_name='log_f
     return r
 
 
-def send_report_and_close(report, driver):
+def send_report_and_close(report, driver, special=''):
     for i in range(10):
-        r = sendNotification("Health report", report)
+        r = sendNotification("Health report", report, additional_message=special)
         if r.status_code == 200:
             break
         else:
             print("Hasn't sent retrying... " + str(i) + " of 10")
-
-    driver.close()
+    if driver is not None:
+        driver.close()
     exit()
 
 
@@ -52,10 +54,25 @@ password = ''  # you should know it
 
 report = ''
 url = 'https://xmuxg.xmu.edu.cn/app/214'
-path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
 
-driver = webdriver.Chrome(path_to_driver)
+options = Options()
+options.add_argument("--start-maximized")
+# options.add_argument("--no-sandbox")
+# options.add_argument("--disable-dev-shm-usage")
+# options.add_argument("--headless")
+
+try:
+    path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
+    driver = webdriver.Chrome(path_to_driver, options=options)
+except WebDriverException:
+    report = 'WebDriver Not Found.'
+    send_report_and_close(report, None, special='FATAL')
+
 driver.get(url)
+
+if '<html dir="ltr" lang="en"><head>' in driver.page_source:
+    report = 'URL is incorrect.'
+    send_report_and_close(report, driver, special='FATAL')
 
 loaded_url = driver.current_url
 
@@ -94,10 +111,17 @@ if 'login' in loaded_url:
 print("logged in")
 
 '''
-    CHECK DATE
+    SELECT PROPER SECTION
 '''
+print("selecting daily health section")
+dhr_section = waitForElement(driver, element_info="//div[@class='box_main box_flex']//div[1]//div[2]//div[2]")
+dhr_section.click()
+
 menu_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
 
+'''
+    CHECK DATE
+'''
 curdate = datetime.today().strftime('%Y-%m-%d')
 if len(driver.find_elements_by_xpath("//span[text()[contains(.,'" + curdate + "')]]")) > 0:
     print("date is correct:", curdate)
@@ -112,11 +136,10 @@ else:
 hours = int(datetime.today().strftime('%H'))
 minutes = int(datetime.today().strftime('%M'))
 
-if hours >= 16 and minutes >= 30:
+if hours > 16 or (hours == 16 and minutes >= 30):
     print("too late for the daily health report")
     report += "Time BAD."
     send_report_and_close(report, driver)
-    # TODO: send_report_and_close()
 else:
     print("time's alright:", hours, ':', minutes)
     report += "Time OK."
@@ -198,4 +221,3 @@ print("6) has been saved")
 '''
 print("It should be done by now")
 send_report_and_close(report, driver)
-
