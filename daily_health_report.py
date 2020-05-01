@@ -84,13 +84,13 @@ if 'login' in loaded_url:
     # loging_button = driver.find_element_by_xpath("//button[contains(.,'统一身份认证')]")
     login_button.click()
 
-    login_field = driver.find_element_by_name("username")
+    login_field = driver.find_element_by_xpath("//input[@id='username']")
     login_field.click()
     print('clicking login')
     # login_field.clear()
     login_field.send_keys(login)
 
-    password_field = driver.find_element_by_name("password")
+    password_field = driver.find_element_by_xpath("//input[@id='password']")
     password_field.click()
     print('clicking password')
     # password_field.clear()
@@ -160,7 +160,8 @@ not_used = waitForElement(driver, element_info="//span[text()[contains(.,'37.3')
 
 # ready to continue
 # hoping that the last element is the confirmation one
-confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'form-control dropdown-toggle')]")[-1]
+# confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'form-control dropdown-toggle')]")[-1]
+confirmation_field = driver.find_element_by_css_selector('div.page-header-fixed.blue-style.reset-container div.page-container.container-fluid div.page-content.row div.col-sm-12.page.left-show div.app-detail-page-form:nth-child(2) div.middle.middle-top div.preview-container:nth-child(1) div.preview-page.pc-view div.container-fluid.form-preview-content.pc-view.form-view:nth-child(4) div.form-style div.row.cell-div-pc:nth-child(23) div.form-group.form-cell.col-sm-12 div.v-select.btn-block.info-value.btn-group > div.form-control.dropdown-toggle')
 
 '''
     CLICK YES
