@@ -1,15 +1,16 @@
 import os
 import requests
+import configparser
 from datetime import datetime
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
 
-def waitForElement(driver, by_what=By.XPATH, element_info='', delay=60, do_quit=True):
+def waitForElement(driver, by_what=By.XPATH, element_info='', delay=90, do_quit=True):
     try:
         elem = WebDriverWait(driver, delay).until(EC.presence_of_element_located((by_what, element_info)))
         print("Page is ready!")
@@ -23,7 +24,7 @@ def waitForElement(driver, by_what=By.XPATH, element_info='', delay=60, do_quit=
         return None
 
 
-def sendNotification(app_name, message, additional_message='', event_name='program_log', special='FATAL'):
+def sendNotification(app_name, message, additional_message='', event_name='program_log'):
     my_key = 'dtFZmutEg9ANUtSEpAU7Tu'
     data = {
         "value1": app_name,
@@ -48,9 +49,11 @@ def send_report_and_close(report, driver, special=''):
         driver.close()
     exit()
 
+config = configparser.ConfigParser()
+config.read('config.ini')
 
-login = ''  # student number
-password = ''  # you should know it
+login = config['XMU']['login']
+password = config['XMU']['password']
 
 report = ''
 url = 'https://xmuxg.xmu.edu.cn/app/214'
@@ -68,11 +71,13 @@ except WebDriverException:
     report = 'WebDriver Not Found.'
     send_report_and_close(report, None, special='FATAL')
 
+
 driver.get(url)
 
 if '<html dir="ltr" lang="en"><head>' in driver.page_source:
     report = 'URL is incorrect.'
     send_report_and_close(report, driver, special='FATAL')
+
 
 loaded_url = driver.current_url
 
@@ -81,7 +86,6 @@ if 'login' in loaded_url:
     # log in here then
     print('0) trying to log in')
     login_button = waitForElement(driver, element_info="//button[contains(.,'统一身份认证')]")
-    # loging_button = driver.find_element_by_xpath("//button[contains(.,'统一身份认证')]")
     login_button.click()
 
     login_field = driver.find_element_by_xpath("//input[@id='username']")
@@ -115,6 +119,9 @@ print("logged in")
 '''
 print("selecting daily health section")
 dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
+
+nav_bar = driver.find_element_by_css_selector("div.page-header-fixed.blue-style.reset-container nav.navbar.nav-container div.container-fluid:nth-child(1) div.navbar-header.pull-left div.menu-toggle.pull-left > i.maticon")
+nav_bar.click()
 dhr_section.click()
 
 menu_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
@@ -141,7 +148,7 @@ if hours > 16 or (hours == 16 and minutes >= 30):
     report += "Time BAD."
     send_report_and_close(report, driver)
 else:
-    print("time's alright:", hours, ':', minutes)
+    print("time is alright:", hours, ':', minutes)
     report += "Time OK."
 
 '''
@@ -161,7 +168,7 @@ not_used = waitForElement(driver, element_info="//span[text()[contains(.,'37.3')
 # ready to continue
 # hoping that the last element is the confirmation one
 # confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'form-control dropdown-toggle')]")[-1]
-confirmation_field = driver.find_element_by_css_selector('div.page-header-fixed.blue-style.reset-container div.page-container.container-fluid div.page-content.row div.col-sm-12.page.left-show div.app-detail-page-form:nth-child(2) div.middle.middle-top div.preview-container:nth-child(1) div.preview-page.pc-view div.container-fluid.form-preview-content.pc-view.form-view:nth-child(4) div.form-style div.row.cell-div-pc:nth-child(23) div.form-group.form-cell.col-sm-12 div.v-select.btn-block.info-value.btn-group > div.form-control.dropdown-toggle')
+confirmation_field = driver.find_element_by_xpath('/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[20]/div[1]/div[1]/div[1]')
 
 '''
     CLICK YES
@@ -172,7 +179,7 @@ if len(driver.find_elements_by_xpath("//span[text()[contains(.,'是 Yes')]]")) >
     # clicking outside
     # driver.find_element_by_xpath("//body").click()
 else:
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+    # driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
     # hoping that the last element is the confirmation one
     confirmation_field.click()
     print("2) chose confirmation field")
@@ -193,11 +200,13 @@ save_button = driver.find_elements_by_xpath("//span[text()[contains(.,'保存')]
 
 saved_suc = None
 retry = -1
+driver.execute_script("arguments[0].scrollIntoView(true);", save_button)
 while saved_suc is None and retry < 10:
     retry += 1
     if retry > 0:
         print("Hasn't saved retrying:", retry, "of 10")
-    save_button.click()
+    # save_button.click()
+    driver.execute_script("arguments[0].click();", save_button)
     print("4) clicked save")
 
     '''
@@ -209,7 +218,7 @@ while saved_suc is None and retry < 10:
     '''
         保存成功
     '''
-    saved_suc = waitForElement(driver, delay=7, element_info="//pre[contains(@class, 'message')]", do_quit=False)
+    saved_suc = waitForElement(driver, element_info="//pre[contains(@class, 'message')]", do_quit=False)
 
 report += 'Saved OK.'
 if retry > 0:
