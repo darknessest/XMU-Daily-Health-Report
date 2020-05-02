@@ -1,19 +1,20 @@
-import os
-import requests
 import configparser
+import os
 from datetime import datetime
+
+import requests
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 def waitForElement(driver, by_what=By.XPATH, element_info='', delay=90, do_quit=True):
     try:
         elem = WebDriverWait(driver, delay).until(EC.presence_of_element_located((by_what, element_info)))
-        print("Page is ready!")
+        # print("Page is ready!")
         return elem
     except TimeoutException:
         print("Loading took too much time!")
@@ -24,8 +25,7 @@ def waitForElement(driver, by_what=By.XPATH, element_info='', delay=90, do_quit=
         return None
 
 
-def sendNotification(app_name, message, additional_message='', event_name='program_log'):
-    my_key = 'dtFZmutEg9ANUtSEpAU7Tu'
+def sendNotification(my_key, app_name, message, additional_message='', event_name='program_log'):
     data = {
         "value1": app_name,
         "value2": message,
@@ -39,16 +39,22 @@ def sendNotification(app_name, message, additional_message='', event_name='progr
 
 
 def send_report_and_close(report, driver, special=''):
-    for i in range(10):
-        r = sendNotification("Health report", report, additional_message=special)
-        if r.status_code == 200:
-            break
-        else:
-            print("Hasn't sent retrying... " + str(i) + " of 10")
+    my_key = config['IFTTT']['my_key']
+    if my_key != '':
+        for i in range(10):
+            r = sendNotification(my_key, "Health report", report, additional_message=special)
+            if r.status_code == 200:
+                break
+            else:
+                print("Hasn't sent retrying... " + str(i) + " of 10")
     if driver is not None:
         driver.close()
     exit()
 
+
+'''
+    SETTINGS
+'''
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -64,6 +70,10 @@ options.add_argument("--start-maximized")
 # options.add_argument("--disable-dev-shm-usage")
 # options.add_argument("--headless")
 
+
+'''
+    LOAD WEBSITE
+'''
 try:
     path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
     driver = webdriver.Chrome(path_to_driver, options=options)
@@ -71,17 +81,17 @@ except WebDriverException:
     report = 'WebDriver Not Found.'
     send_report_and_close(report, None, special='FATAL')
 
-
 driver.get(url)
 
 if '<html dir="ltr" lang="en"><head>' in driver.page_source:
     report = 'URL is incorrect.'
     send_report_and_close(report, driver, special='FATAL')
 
-
 loaded_url = driver.current_url
 
-# In case you are not logged in
+'''
+    LOG IN
+'''
 if 'login' in loaded_url:
     # log in here then
     print('0) trying to log in')
@@ -114,27 +124,18 @@ if 'login' in loaded_url:
 
 print("logged in")
 
-
 '''
     SELECT PROPER SECTION
 '''
-print("selecting daily health section")
-dhr_section = waitForElement(driver, element_info="//div[@class='box_main box_flex']//div[1]//div[2]//div[2]")
-dhr_section.click()
+print("closing nav bar")
+nav_bar = waitForElement(driver, element_info="//div[@class='menu-toggle pull-left']//i[@class='maticon']")
+nav_bar.click()
 
-menu_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
-
-'''
-    SELECT PROPER SECTION
-'''
 print("selecting daily health section")
 dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
-
-nav_bar = driver.find_element_by_css_selector("div.page-header-fixed.blue-style.reset-container nav.navbar.nav-container div.container-fluid:nth-child(1) div.navbar-header.pull-left div.menu-toggle.pull-left > i.maticon")
-nav_bar.click()
 dhr_section.click()
 
-menu_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
+tab_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
 
 '''
     CHECK DATE
@@ -165,9 +166,8 @@ else:
     REPORTING PART
     MENU BUTTON
 '''
-
-menu_button.click()
-print("1) chose 我的菜单")
+print("1) choosing 我的菜单")
+tab_button.click()
 
 '''
     CONFIRMATION FIELD
@@ -177,8 +177,10 @@ not_used = waitForElement(driver, element_info="//span[text()[contains(.,'37.3')
 
 # ready to continue
 # hoping that the last element is the confirmation one
-# confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'form-control dropdown-toggle')]")[-1]
-confirmation_field = driver.find_element_by_xpath('/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[20]/div[1]/div[1]/div[1]')
+# confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'btn-content')]")[-1]
+# might be problematic
+confirmation_field = driver.find_element_by_css_selector(
+    'div.page-header-fixed.blue-style div.page-container.container-fluid div.page-content.row div.col-sm-12.page div.app-detail-page-form:nth-child(2) div.middle.middle-top div.preview-container:nth-child(1) div.preview-page.pc-view div.container-fluid.form-preview-content.pc-view.form-view:nth-child(4) div.form-style div.row.cell-div-pc:nth-child(23) div.form-group.form-cell.col-sm-12 div.v-select.btn-block.info-value.btn-group > div.form-control.dropdown-toggle')
 
 '''
     CLICK YES
@@ -205,9 +207,8 @@ print("3) clicked yes-button")
 save_button = driver.find_elements_by_xpath("//span[text()[contains(.,'保存')]]")[-1]
 
 '''
-    保存成功
+    SAVING
 '''
-
 saved_suc = None
 retry = -1
 driver.execute_script("arguments[0].scrollIntoView(true);", save_button)
