@@ -122,7 +122,7 @@ if 'login' in loaded_url:
         report = "Hasn't logged in. Check log:pass"
         send_report_and_close(report, driver)
 
-print("logged in")
+# print("logged in")
 
 '''
     SELECT PROPER SECTION
@@ -173,7 +173,7 @@ tab_button.click()
     CONFIRMATION FIELD
 '''
 # waiting for tab to load up properly
-not_used = waitForElement(driver, element_info="//span[text()[contains(.,'37.3')]]")
+not_used = waitForElement(driver, element_info="//span[contains(text(),'No need to fill out or c')]")
 
 # ready to continue
 # hoping that the last element is the confirmation one
@@ -181,6 +181,10 @@ not_used = waitForElement(driver, element_info="//span[text()[contains(.,'37.3')
 # might be problematic
 confirmation_field = driver.find_element_by_css_selector(
     'div.page-header-fixed.blue-style div.page-container.container-fluid div.page-content.row div.col-sm-12.page div.app-detail-page-form:nth-child(2) div.middle.middle-top div.preview-container:nth-child(1) div.preview-page.pc-view div.container-fluid.form-preview-content.pc-view.form-view:nth-child(4) div.form-style div.row.cell-div-pc:nth-child(23) div.form-group.form-cell.col-sm-12 div.v-select.btn-block.info-value.btn-group > div.form-control.dropdown-toggle')
+# Consider using following
+# confirmation_field = driver.find_element_by_xpath('/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[20]/div[1]/div[1]/div[1]')
+
+
 
 '''
     CLICK YES
