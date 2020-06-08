@@ -1,7 +1,7 @@
 import configparser
 import os
 from datetime import datetime
-
+from time import sleep
 import requests
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, WebDriverException
@@ -128,14 +128,24 @@ if 'login' in loaded_url:
     SELECT PROPER SECTION
 '''
 print("closing nav bar")
-nav_bar = waitForElement(driver, element_info="//div[@class='menu-toggle pull-left']")
+nav_bar = waitForElement(driver, element_info="//div[@class='menu-toggle pull-left']//i[@class='maticon']")
 nav_bar.click()
 
 print("selecting daily health section")
+
 dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
 dhr_section.click()
 
+'''
+    NEW TAB HERE
+'''
+sleep(1)    # waiting for tab to open/appear
+driver.switch_to.window(driver.window_handles[0])
+driver.close()
+
+driver.switch_to.window(driver.window_handles[-1])
 tab_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
+
 
 '''
     CHECK DATE
@@ -154,13 +164,15 @@ else:
 hours = int(datetime.today().strftime('%H'))
 minutes = int(datetime.today().strftime('%M'))
 
-if hours > 19 or (hours == 19 and minutes >= 30):
+if (hours == 19 and minutes >= 30) or hours < 7:
     print("too late for the daily health report")
     report += "Time BAD."
     send_report_and_close(report, driver)
 else:
     print("time is alright:", hours, ':', minutes)
     report += "Time OK."
+
+
 
 '''
     REPORTING PART
