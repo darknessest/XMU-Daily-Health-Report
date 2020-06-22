@@ -66,16 +66,17 @@ url = 'https://xmuxg.xmu.edu.cn/app/214'
 
 options = Options()
 options.add_argument("--start-maximized")
-# options.add_argument("--no-sandbox")
-# options.add_argument("--disable-dev-shm-usage")
-# options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--headless")
 
 
 '''
     LOAD WEBSITE
 '''
 try:
-    path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
+    #path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
+    path_to_driver = '/usr/bin/chromedriver'
     driver = webdriver.Chrome(path_to_driver, options=options)
 except WebDriverException:
     report = 'WebDriver Not Found.'
@@ -133,7 +134,9 @@ nav_bar.click()
 
 print("selecting daily health section")
 
-dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
+dhr_section = waitForElement(driver, by_what=By.CSS_SELECTOR, element_info="div.page-header-fixed.blue-style div.page-container.container-fluid div.page-content.row div.col-sm-12.page div.main-p div.shadow_box.box_wrap_2:nth-child(2) div:nth-child(2) div.box_main.box_flex div.app_child.box_flex:nth-child(1) div.grow_1.box_flex.column.justify_center > div.title.box_flex")
+
+# dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
 dhr_section.click()
 
 '''
