@@ -142,7 +142,7 @@ dhr_section.click()
 '''
     NEW TAB HERE
 '''
-sleep(1)    # waiting for tab to open/appear
+sleep(30)    # waiting for tab to open/appear
 driver.switch_to.window(driver.window_handles[0])
 driver.close()
 
