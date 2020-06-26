@@ -42,7 +42,7 @@ def send_report_and_close(report, driver, special=''):
     my_key = config['IFTTT']['my_key']
     if my_key != '':
         for i in range(10):
-            r = sendNotification(my_key, "Health report", report, additional_message=special)
+            r = sendNotification(my_key, "RPI DHR", report, additional_message=special)
             if r.status_code == 200:
                 break
             else:
