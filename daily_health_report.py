@@ -204,7 +204,7 @@ confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'v-se
 '''
     CLICK YES
 '''
-if len(driver.find_elements_by_xpath("//span[text()[contains(.,'是 Yes')]]")) > 0:
+if len(driver.find_elements_by_xpath("//label[@class='btn-block']//span[contains(text(),'Yes')]")) > 0:
     print("confirmation is already yes, consider checking website yourself")
     report += 'Yes already.'
     # clicking outside
