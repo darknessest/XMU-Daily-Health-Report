@@ -1,4 +1,4 @@
-import os
+# import os     # needed for paths
 from datetime import datetime
 from time import sleep
 
@@ -58,15 +58,15 @@ def fill_in(login, password):
 
     options = Options()
     options.add_argument("--start-maximized")
-    # options.add_argument("--no-sandbox")
-    # options.add_argument("--disable-dev-shm-usage")
-    # options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--headless")
 
     '''
         LOAD WEBSITE
     '''
     try:
-        path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
+        path_to_driver = '/usr/bin/chromedriver'
         driver = webdriver.Chrome(path_to_driver, options=options)
     except WebDriverException:
         report = 'WebDriver Not Found.'
@@ -124,8 +124,8 @@ def fill_in(login, password):
 
     print("selecting daily health section")
 
-    # dhr_section = waitForElement(driver, element_info="//div[contains(text(),'防疫管理')]")
-    dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
+    dhr_section = waitForElement(driver, element_info="//div[contains(text(),'防疫管理')]")
+    # dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
     dhr_section.click()
 
     '''
@@ -174,7 +174,7 @@ def fill_in(login, password):
         CONFIRMATION FIELD
     '''
     # waiting for tab to load up properly
-    not_used = waitForElement(driver, element_info="//span[contains(text(),'No need to fill out or c')]")
+    _ = waitForElement(driver, element_info="//span[contains(text(),'No need to fill out or c')]")
 
     # ready to continue
     # hoping that the last element is the confirmation one
