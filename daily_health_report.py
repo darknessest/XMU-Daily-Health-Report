@@ -133,19 +133,18 @@ nav_bar.click()
 
 print("selecting daily health section")
 
-dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
+dhr_section = waitForElement(driver, element_info="//div[contains(text(),'防疫管理')]")
 dhr_section.click()
 
 '''
     NEW TAB HERE
 '''
-sleep(1)    # waiting for tab to open/appear
+sleep(10)  # waiting for tab to open/appear
 driver.switch_to.window(driver.window_handles[0])
 driver.close()
 
 driver.switch_to.window(driver.window_handles[-1])
 tab_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
-
 
 '''
     CHECK DATE
@@ -172,8 +171,6 @@ else:
     print("time is alright:", hours, ':', minutes)
     report += "Time OK."
 
-
-
 '''
     REPORTING PART
     MENU BUTTON
@@ -195,7 +192,6 @@ confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'v-se
 #     'div.page-header-fixed.blue-style div.page-container.container-fluid div.page-content.row div.col-sm-12.page div.app-detail-page-form:nth-child(2) div.middle.middle-top div.preview-container:nth-child(1) div.preview-page.pc-view div.container-fluid.form-preview-content.pc-view.form-view:nth-child(4) div.form-style div.row.cell-div-pc:nth-child(23) div.form-group.form-cell.col-sm-12 div.v-select.btn-block.info-value.btn-group > div.form-control.dropdown-toggle')
 # Consider using following
 # confirmation_field = driver.find_element_by_xpath('/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[20]/div[1]/div[1]/div[1]')
-
 
 
 '''
