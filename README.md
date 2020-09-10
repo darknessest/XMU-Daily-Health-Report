@@ -1,13 +1,18 @@
 Small script to automate filling in XMU's daily health report
 
-Sending notifications over IFTTT supported.
+#### Features:
+ - Filling in for multiple accounts.
+ - Sending notifications over IFTTT.
 
-Tested on MacOS (Catalina) + chrome driver (81) + Selenium (3.141.0)
 
-Requirements:
+Tested on:
+ - MacOS (Catalina) + chrome driver (81-84) + Selenium (3.141.0)
+ - Raspberry Pi Zero and 4
+
+
+#### Requirements:
 ```
-requests
-selenium ~= 3.14
+requests selenium ~= 3.14
 ```
 Also don't forget to download proper browser driver. Version of your browser driver should be the same(or higher) as your
 currently installed browser. 
@@ -20,6 +25,6 @@ You can download chromeDriver from [official website](https://sites.google.com/a
 ~~Or use ones in this git. There were downloaded from the official website on 2020/03/28.~~
 
 To run:
-1) fill in login and password in config.ini file (, and IFTTT key if you have it) 
+1) fill in login and password in config.py file (, and IFTTT key if you have it) 
 2) provide a path to your webdriver
 3) run the script
