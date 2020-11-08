@@ -1,5 +1,8 @@
 Small script to automate filling in XMU's daily health report
 
+To improve cloning speed please use:
+`git clone https://github.com/darknessest/XMU-Daily-Health-Report.git --depth 1`
+
 #### Features:
  - Filling in for multiple accounts.
  - Sending notifications over IFTTT.
