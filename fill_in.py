@@ -42,7 +42,7 @@ def sendNotification(app_name, message, additional_message, event_name='program_
 def send_report_and_close(report, driver, special=''):
     if ifttt_key != '':
         for i in range(10):
-            r = sendNotification(ifttt_key, "Health report", report, special)
+            r = sendNotification("Health report", report, special)
             if r.status_code == 200:
                 break
             else:
@@ -88,8 +88,9 @@ def fill_in(login, password):
         print('0) trying to log in')
         login_button = waitForElement(driver, element_info="//button[contains(.,'统一身份认证')]")
         login_button.click()
-
-        login_field = driver.find_element_by_xpath("//input[@id='username']")
+        
+        login_field = waitForElement(driver, element_info="//input[@id='username']")
+        loaded_url = driver.current_url
         login_field.click()
         print('clicking login')
         # login_field.clear()
@@ -102,8 +103,10 @@ def fill_in(login, password):
         password_field.send_keys(password)
 
         # press login/登录
-        loging_button = driver.find_element_by_xpath("//button[contains(.,'登录/Login')]")
+        #loging_button = waitForElement(driver, element_info="/html[1]/body[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[1]/form[1]/p[5]/button[1]")
+        loging_button = waitForElement(driver, element_info="//button[contains(.,'登录/Login')]")
         loging_button.click()
+        sleep(3)
 
         if loaded_url != driver.current_url:
             print("logged in successfully")
@@ -112,13 +115,14 @@ def fill_in(login, password):
             print("Hasn't logged in")
             report = "Hasn't logged in. Check log:pass"
             send_report_and_close(report, driver)
-
+            exit()
     # print("logged in")
 
     '''
         SELECT PROPER SECTION
     '''
     print("closing nav bar")
+
     nav_bar = waitForElement(driver, element_info="//div[@class='menu-toggle pull-left']//i[@class='maticon']")
     nav_bar.click()
 
@@ -241,3 +245,4 @@ def fill_in(login, password):
     '''
     print("It should be done by now with", login)
     send_report_and_close(report, driver)
+
