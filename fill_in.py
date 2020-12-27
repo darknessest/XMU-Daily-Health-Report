@@ -104,7 +104,7 @@ def fill_in(login, password):
 
         # press login/登录
         #loging_button = waitForElement(driver, element_info="/html[1]/body[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[1]/form[1]/p[5]/button[1]")
-        loging_button = waitForElement(driver, element_info="//button[contains(.,'登录/Login')]")
+        loging_button = waitForElement(driver, element_info="//button[contains(text(),'Sign in')]")
         loging_button.click()
         sleep(3)
 
@@ -162,7 +162,7 @@ def fill_in(login, password):
     if (hours == 19 and minutes >= 30) or hours < 7:
         print("too late for the daily health report")
         report += "Time BAD."
-        send_report_and_close(report, driver)
+        # send_report_and_close(report, driver)
     else:
         print("time is alright:", hours, ':', minutes)
         report += "Time OK."
