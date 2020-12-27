@@ -1,6 +1,6 @@
-/chromedriver
-/config.py
-/.ipynb_checkpoints/
+chromedriver/
+config.py
+.ipynb_checkpoints/
 .idea/
 
 # Byte-compiled / optimized / DLL files

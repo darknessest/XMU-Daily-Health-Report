@@ -103,8 +103,7 @@ def fill_in(login, password):
         password_field.send_keys(password)
 
         # press login/登录
-        #loging_button = waitForElement(driver, element_info="/html[1]/body[1]/div[2]/div[2]/div[2]/div[1]/div[3]/div[1]/form[1]/p[5]/button[1]")
-        loging_button = waitForElement(driver, element_info="//button[contains(.,'登录/Login')]")
+        loging_button = waitForElement(driver, element_info="//button[contains(text(),'Sign in')]")
         loging_button.click()
         sleep(3)
 
