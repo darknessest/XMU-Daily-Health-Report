@@ -3,7 +3,11 @@ Small script to automate filling in XMU's daily health report
 To improve cloning speed please use:
 `git clone https://github.com/darknessest/XMU-Daily-Health-Report.git --depth 1`
 
-It's recommended to add use the script at random time. For example, like in rpi0 branch.
+> Notification:
+> 
+> for winter holidays, fill in staying address yourself.
+> You need to do it only once and then script will work as usual
+> (just clicking 'yes').
 
 #### Features:
  - Filling in for multiple accounts.

@@ -65,6 +65,7 @@ def fill_in(login, password):
     '''
         LOAD WEBSITE
     '''
+    driver = None
     try:
         path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
         driver = webdriver.Chrome(path_to_driver, options=options)
@@ -102,7 +103,7 @@ def fill_in(login, password):
         password_field.send_keys(password)
 
         # press login/登录
-        loging_button = driver.find_element_by_xpath("//button[contains(.,'登录/Login')]")
+        loging_button = driver.find_element_by_xpath("//button[contains(text(),'Sign in')]")
         loging_button.click()
 
         if loaded_url != driver.current_url:
@@ -174,7 +175,7 @@ def fill_in(login, password):
         CONFIRMATION FIELD
     '''
     # waiting for tab to load up properly
-    not_used = waitForElement(driver, element_info="//span[contains(text(),'No need to fill out or c')]")
+    _ = waitForElement(driver, element_info="//span[contains(text(),'Can you hereby declare that all the information pr')]")
 
     # ready to continue
     # hoping that the last element is the confirmation one
