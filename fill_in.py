@@ -177,7 +177,7 @@ def fill_in(login, password):
         CONFIRMATION FIELD
     '''
     # waiting for tab to load up properly
-    _ = waitForElement(driver, element_info="//span[contains(text(),'No need to fill out or c')]")
+    _ = waitForElement(driver, element_info="//span[contains(text(),'Can you hereby declare that all the information pr')]")
 
     # ready to continue
     # hoping that the last element is the confirmation one
