@@ -14,7 +14,11 @@ for i in range(len(login)):
     sleep(timeout)
 
     if login[i] != '' and password[i] != '':
-        fill_in(login[i], password[i])
+        retry = 0
+        while not fill_in(login[i], password[i]):
+            retry += 1
+            if retry == 10:
+                break
     else:
         print("Don't forget to fill in login and password in config.py")
 
