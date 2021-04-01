@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from config import ifttt_key
+from config import ifttt_key, webvpn
 
 
 def waitForElement(driver, by_what=By.XPATH, element_info='', delay=90, do_quit=True):
@@ -54,7 +54,8 @@ def send_report_and_close(report, driver, special=''):
 
 def fill_in(login, password):
     report = ''
-    url = 'https://xmuxg.xmu.edu.cn/app/214'
+    # url = 'https://xmuxg.xmu.edu.cn/app/214'
+    url = 'https://webvpn.xmu.edu.cn/login'
 
     options = Options()
     options.add_argument("--start-maximized")
@@ -80,12 +81,47 @@ def fill_in(login, password):
         send_report_and_close(report, driver, special='FATAL')
         return False
 
-    loaded_url = driver.current_url
+    if webvpn[0] == '' or webvpn[1] == '':
+        report = 'webVPN login and/or password is empty'
+        send_report_and_close(report, driver, special='FATAL')
+        return False
 
-    '''
-        LOG IN
-    '''
     try:
+        '''
+            logging into webvpn
+        '''
+        login_field = waitForElement(driver, element_info="//input[@id='user_name']")
+        login_field.click()
+        print('clicking login')
+        # login_field.clear()
+        login_field.send_keys(webvpn[0])
+
+        password_field = waitForElement(driver, element_info="//input[@type='password']")
+        password_field.click()
+        print('clicking password')
+        # password_field.clear()
+        password_field.send_keys(webvpn[1])
+
+        loging_button = waitForElement(driver, element_info="//button[@id='login']")
+        loging_button.click()
+
+        xmuxgbutton = waitForElement(driver, element_info="//p[contains(text(),'https://xmuxg.xmu.edu.cn/')]")
+        xmuxgbutton.click()
+
+        sleep(5)
+        driver.switch_to.window(driver.window_handles[0])
+        driver.close()
+        driver.switch_to.window(driver.window_handles[-1])
+
+        loaded_url = driver.current_url
+
+        if url != loaded_url:
+            print("logged into webvpn successfully")
+            report += "WebVPN OK."
+
+        '''
+            LOG IN
+        '''
         if 'login' in loaded_url:
             # log in here then
             print('0) trying to log in')
