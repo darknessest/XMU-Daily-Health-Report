@@ -1,4 +1,5 @@
 import os
+import traceback
 from datetime import datetime
 from time import sleep
 
@@ -245,7 +246,7 @@ def fill_in(login, password):
             SAVE BUTTON
         '''
         # May cause some problems if there will be something below the button
-        save_button = driver.find_elements_by_xpath("//span[text()[contains(.,'保存')]]")[-1]
+        save_button = driver.find_element_by_xpath("//span[contains(@class, 'form-save position-absolute')]")
 
         '''
             SAVING
@@ -287,5 +288,6 @@ def fill_in(login, password):
         return True
     except Exception as e:
         print("bullshit:", e)
-        send_report_and_close("Some bullshit happened with " + login + ", retring", None, special='FATAL')
+        print(traceback.format_exc())
+        # send_report_and_close("Some bullshit happened with " + login + ", retring", None, special='FATAL')
         return False
