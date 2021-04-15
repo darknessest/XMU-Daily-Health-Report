@@ -2,6 +2,7 @@ import traceback
 from datetime import datetime
 from time import sleep
 
+from pyvirtualdisplay import Display
 import requests
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, WebDriverException
@@ -61,8 +62,9 @@ def fill_in(login, password):
     options.add_argument("--start-maximized")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--headless")
-
+    #options.add_argument("--headless")
+    display = Display(visible=0, size=(1280, 720))
+    display.start()
     '''
         LOAD WEBSITE
     '''
@@ -75,7 +77,7 @@ def fill_in(login, password):
         return False
 
     driver.get(url)
-
+    #sleep(5)
     if '<html dir="ltr" lang="en"><head>' in driver.page_source:
         report = 'URL is incorrect.'
         send_report_and_close(report, driver, special='FATAL')
