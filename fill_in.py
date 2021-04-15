@@ -1,4 +1,4 @@
-# import os     # needed for paths
+import traceback
 from datetime import datetime
 from time import sleep
 
@@ -108,7 +108,7 @@ def fill_in(login, password):
         xmuxgbutton = waitForElement(driver, element_info="//p[contains(text(),'https://xmuxg.xmu.edu.cn/')]")
         xmuxgbutton.click()
 
-        sleep(5)
+        sleep(3)
         driver.switch_to.window(driver.window_handles[0])
         driver.close()
         driver.switch_to.window(driver.window_handles[-1])
@@ -142,7 +142,7 @@ def fill_in(login, password):
             password_field.send_keys(password)
 
             # press login/登录
-            loging_button = waitForElement(driver, element_info="//button[contains(text(),'Sign in')]")
+            loging_button = waitForElement(driver, element_info="//button[contains(@class, 'auth_login_btn')]")
             loging_button.click()
             sleep(3)
 
@@ -173,12 +173,19 @@ def fill_in(login, password):
         '''
             NEW TAB HERE
         '''
-        sleep(10)  # waiting for tab to open/appear
+        sleep(3)  # waiting for tab to open/appear
         driver.switch_to.window(driver.window_handles[0])
         driver.close()
 
         driver.switch_to.window(driver.window_handles[-1])
         tab_button = waitForElement(driver, element_info="//div[contains(@class, 'tab')][2]")
+
+        '''
+            REPORTING PART
+            MENU BUTTON
+        '''
+        print("1) choosing 我的菜单")
+        tab_button.click()
 
         '''
             CHECK DATE
@@ -206,23 +213,13 @@ def fill_in(login, password):
             report += "Time OK."
 
         '''
-            REPORTING PART
-            MENU BUTTON
-        '''
-        print("1) choosing 我的菜单")
-        tab_button.click()
-
-        '''
             CONFIRMATION FIELD
         '''
-        # waiting for tab to load up properly
-        _ = waitForElement(driver,
-                           element_info="//span[contains(text(),'Can you hereby declare that all the information pr')]")
-
+        sleep(0.5)
         # ready to continue
         # hoping that the last element is the confirmation one
-        confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'v-select btn-block info-value')]")[
-            -1]
+        confirmation_field = \
+            driver.find_elements_by_xpath("//div[contains(@class, 'v-select btn-block info-value btn-group')]")[-1]
 
         '''
             CLICK YES
@@ -246,8 +243,7 @@ def fill_in(login, password):
         '''
             SAVE BUTTON
         '''
-        # May cause some problems if there will be something below the button
-        save_button = driver.find_elements_by_xpath("//span[text()[contains(.,'保存')]]")[-1]
+        save_button = driver.find_element_by_xpath("//span[contains(@class, 'form-save position-absolute')]")
 
         '''
             SAVING
@@ -286,6 +282,8 @@ def fill_in(login, password):
         print("It should be done by now with", login)
         send_report_and_close(report, driver)
         return True
-
-    except:
-        send_report_and_close("Some bullshit happened, retrying for " + str(login), driver, special='FATAL')
+    except Exception as e:
+        print("bullshit:", e)
+        print(traceback.format_exc())
+        # send_report_and_close("Some bullshit happened with " + login + ", retring", None, special='FATAL')
+        return False
