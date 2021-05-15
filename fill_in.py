@@ -55,8 +55,9 @@ def send_report_and_close(report, driver, special=''):
 
 def fill_in(login, password):
     report = ''
-    # url = 'https://xmuxg.xmu.edu.cn/app/214'
-    url = 'https://webvpn.xmu.edu.cn/login'
+    url = 'https://xmuxg.xmu.edu.cn/app/214'
+    if webvpn_enabled:
+        url = 'https://webvpn.xmu.edu.cn/login'
 
     options = Options()
     options.add_argument("--start-maximized")
