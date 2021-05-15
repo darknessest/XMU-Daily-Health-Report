@@ -2,8 +2,8 @@ import traceback
 from datetime import datetime
 from time import sleep
 
-from pyvirtualdisplay import Display
 import requests
+from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.chrome.options import Options
@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from config import ifttt_key, webvpn
+from config import ifttt_key, webvpn, webvpn_enabled
 
 
 def waitForElement(driver, by_what=By.XPATH, element_info='', delay=90, do_quit=True):
@@ -89,37 +89,40 @@ def fill_in(login, password):
         return False
 
     try:
-        '''
-            logging into webvpn
-        '''
-        login_field = waitForElement(driver, element_info="//input[@id='user_name']")
-        login_field.click()
-        print('clicking login')
-        # login_field.clear()
-        login_field.send_keys(webvpn[0])
+        if webvpn_enabled:
+            '''
+                logging into webvpn
+            '''
+            login_field = waitForElement(driver, element_info="//input[@id='user_name']")
+            login_field.click()
+            print('clicking login')
+            # login_field.clear()
+            login_field.send_keys(webvpn[0])
 
-        password_field = waitForElement(driver, element_info="//input[@type='password']")
-        password_field.click()
-        print('clicking password')
-        # password_field.clear()
-        password_field.send_keys(webvpn[1])
+            password_field = waitForElement(driver, element_info="//input[@type='password']")
+            password_field.click()
+            print('clicking password')
+            # password_field.clear()
+            password_field.send_keys(webvpn[1])
 
-        loging_button = waitForElement(driver, element_info="//button[@id='login']")
-        loging_button.click()
+            loging_button = waitForElement(driver, element_info="//button[@id='login']")
+            loging_button.click()
 
-        xmuxgbutton = waitForElement(driver, element_info="//p[contains(text(),'https://xmuxg.xmu.edu.cn/')]")
-        xmuxgbutton.click()
+            xmuxgbutton = waitForElement(driver, element_info="//p[contains(text(),'https://xmuxg.xmu.edu.cn/')]")
+            xmuxgbutton.click()
 
-        sleep(3)
-        driver.switch_to.window(driver.window_handles[0])
-        driver.close()
-        driver.switch_to.window(driver.window_handles[-1])
+            sleep(3)
+            driver.switch_to.window(driver.window_handles[0])
+            driver.close()
+            driver.switch_to.window(driver.window_handles[-1])
+
+            loaded_url = driver.current_url
+
+            if url != loaded_url:
+                print("logged into webvpn successfully")
+                report += "WebVPN OK."
 
         loaded_url = driver.current_url
-
-        if url != loaded_url:
-            print("logged into webvpn successfully")
-            report += "WebVPN OK."
 
         '''
             LOG IN
