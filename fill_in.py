@@ -70,10 +70,10 @@ def fill_in(login, password):
     '''
     driver = None
     try:
-        path_to_driver = os.path.join(os.path.curdir, 'chromedriver')
-        driver = webdriver.Chrome(path_to_driver, options=options)
-    except WebDriverException:
-        report = 'WebDriver Not Found.'
+        path_to_driver = os.path.join(os.curdir, 'chromedriver')
+        driver = webdriver.Chrome(path_to_driver)
+    except WebDriverException as e:
+        report = 'WebDriver Error:' + str(e)
         send_report_and_close(report, None, special='FATAL')
         return False
 
@@ -94,6 +94,11 @@ def fill_in(login, password):
             '''
                 logging into webvpn
             '''
+            if webvpn[0] == '' or webvpn[1] == '':
+                report = 'webVPN login and/or password is empty'
+                send_report_and_close(report, driver, special='FATAL')
+                return False
+
             login_field = driver.find_element_by_xpath("//input[@id='user_name']")
             login_field.click()
             print('clicking login')
