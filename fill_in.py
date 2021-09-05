@@ -16,6 +16,7 @@ from config import ifttt_key, webvpn, webvpn_enabled
 
 def waitForElement(driver, by_what=By.XPATH, element_info='', delay=90, do_quit=True):
     try:
+
         elem = WebDriverWait(driver, delay).until(EC.presence_of_element_located((by_what, element_info)))
         return elem
     except TimeoutException:
@@ -223,11 +224,13 @@ def fill_in(login, password):
         '''
             CONFIRMATION FIELD
         '''
-        sleep(0.5)
+        # sleep(0.5)
         # ready to continue
         # hoping that the last element is the confirmation one
-        confirmation_field = \
-            driver.find_elements_by_xpath("//div[contains(@class, 'v-select btn-block info-value btn-group')]")[-1]
+        print('stuck here')
+        sleep(5)
+        confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'v-select btn-block info-value btn-group')]")[-1]
+        # confirmation_field = waitForElement(driver, element_info="//div[contains(@class, 'v-select btn-block info-value btn-group')]")[-1]
 
         '''
             CLICK YES
@@ -238,7 +241,7 @@ def fill_in(login, password):
             # clicking outside
             # driver.find_element_by_xpath("//body").click()
         else:
-            # driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+
             # hoping that the last element is the confirmation one
             confirmation_field.click()
             print("2) chose confirmation field")
