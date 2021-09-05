@@ -221,7 +221,7 @@ def fill_in(login, password):
         '''
             CONFIRMATION FIELD
         '''
-        sleep(0.5)
+        sleep(5)
         # ready to continue
         # hoping that the last element is the confirmation one
         confirmation_field = \
