@@ -172,8 +172,8 @@ def fill_in(login, password):
 
         print("selecting daily health section")
 
-        dhr_section = waitForElement(driver, element_info="//div[contains(text(),'防疫管理')]")
-        # dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
+        #dhr_section = waitForElement(driver, element_info="//div[contains(text(),'防疫管理')]")
+        dhr_section = waitForElement(driver, element_info="//div[contains(text(),'Daily Health Report')]")
         dhr_section.click()
 
         '''
@@ -221,11 +221,11 @@ def fill_in(login, password):
         '''
             CONFIRMATION FIELD
         '''
+        print("sleeping for 5")
         sleep(5)
         # ready to continue
         # hoping that the last element is the confirmation one
-        confirmation_field = \
-            driver.find_elements_by_xpath("//div[contains(@class, 'v-select btn-block info-value btn-group')]")[-1]
+        confirmation_field = driver.find_elements_by_xpath("//div[contains(@class, 'v-select btn-block info-value btn-group')]")[-1]
 
         '''
             CLICK YES
